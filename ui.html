@@ -8,180 +8,266 @@
     box-sizing: border-box;
 }
 
-body {
+html, body {
     background: transparent;
+    height: 100%;
+}
+
+body {
     display: flex;
     justify-content: center;
     align-items: center;
     height: 100vh;
-    font-family: "Segoe UI", -apple-system, BlinkMacSystemFont, sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", sans-serif;
     overflow: hidden;
     -webkit-app-region: drag;
+    padding: 10px;
 }
 
+/* Apple-style frosted glass pill */
 .container {
+    position: relative;
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 12px;
+    gap: 8px;
     padding: 20px 32px;
-    background: rgba(30, 30, 30, 0.92);
-    backdrop-filter: blur(40px) saturate(180%);
-    -webkit-backdrop-filter: blur(40px) saturate(180%);
-    border-radius: 16px;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.6),
-                0 0 0 1px rgba(255, 255, 255, 0.05) inset;
+    border-radius: 18px;
+    background: rgba(44, 44, 46, 0.78);
+    backdrop-filter: blur(50px) saturate(190%);
+    -webkit-backdrop-filter: blur(50px) saturate(190%);
+    border: 0.5px solid rgba(255, 255, 255, 0.12);
+    box-shadow:
+        0 10px 40px rgba(0, 0, 0, 0.35),
+        0 0 0 0.5px rgba(255, 255, 255, 0.05),
+        inset 0 0.5px 0 rgba(255, 255, 255, 0.1);
     opacity: 0;
-    transform: scale(0.9);
-    transition: all 0.3s ease;
+    transform: scale(0.92) translateY(4px);
+    transition: all 0.4s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .container.visible {
     opacity: 1;
-    transform: scale(1);
+    transform: scale(1) translateY(0);
 }
 
 .container.idle {
     opacity: 0;
-    transform: scale(0.9);
+    transform: scale(0.92) translateY(4px);
 }
 
+/* Audio bars */
 .bars-container {
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 4px;
-    height: 40px;
+    height: 36px;
 }
 
 .bar {
-    width: 4px;
-    height: 8px;
-    background: linear-gradient(180deg, #ff6b6b, #ff8e53);
+    width: 3.5px;
+    height: 6px;
     border-radius: 2px;
     transition: all 0.2s ease;
 }
 
-/* Recording state - red/orange pulsing bars */
+/* Recording — warm orange */
 .recording .bar {
-    background: linear-gradient(180deg, #ff6b6b, #ff8e53);
+    background: #ff9f0a;
+    box-shadow: 0 0 10px rgba(255, 159, 10, 0.4);
 }
 
-.recording .bar:nth-child(1) { animation: pulse 0.8s ease-in-out infinite; animation-delay: 0.0s; }
-.recording .bar:nth-child(2) { animation: pulse 0.8s ease-in-out infinite; animation-delay: 0.1s; }
-.recording .bar:nth-child(3) { animation: pulse 0.8s ease-in-out infinite; animation-delay: 0.2s; }
-.recording .bar:nth-child(4) { animation: pulse 0.8s ease-in-out infinite; animation-delay: 0.3s; }
-.recording .bar:nth-child(5) { animation: pulse 0.8s ease-in-out infinite; animation-delay: 0.4s; }
-.recording .bar:nth-child(6) { animation: pulse 0.8s ease-in-out infinite; animation-delay: 0.3s; }
-.recording .bar:nth-child(7) { animation: pulse 0.8s ease-in-out infinite; animation-delay: 0.2s; }
-.recording .bar:nth-child(8) { animation: pulse 0.8s ease-in-out infinite; animation-delay: 0.1s; }
-.recording .bar:nth-child(9) { animation: pulse 0.8s ease-in-out infinite; animation-delay: 0.0s; }
+.recording .bar:nth-child(1)  { animation: pulse 0.8s ease-in-out infinite; animation-delay: 0.0s; }
+.recording .bar:nth-child(2)  { animation: pulse 0.8s ease-in-out infinite; animation-delay: 0.08s; }
+.recording .bar:nth-child(3)  { animation: pulse 0.8s ease-in-out infinite; animation-delay: 0.16s; }
+.recording .bar:nth-child(4)  { animation: pulse 0.8s ease-in-out infinite; animation-delay: 0.24s; }
+.recording .bar:nth-child(5)  { animation: pulse 0.8s ease-in-out infinite; animation-delay: 0.32s; }
+.recording .bar:nth-child(6)  { animation: pulse 0.8s ease-in-out infinite; animation-delay: 0.4s; }
+.recording .bar:nth-child(7)  { animation: pulse 0.8s ease-in-out infinite; animation-delay: 0.32s; }
+.recording .bar:nth-child(8)  { animation: pulse 0.8s ease-in-out infinite; animation-delay: 0.24s; }
+.recording .bar:nth-child(9)  { animation: pulse 0.8s ease-in-out infinite; animation-delay: 0.16s; }
+.recording .bar:nth-child(10) { animation: pulse 0.8s ease-in-out infinite; animation-delay: 0.08s; }
+.recording .bar:nth-child(11) { animation: pulse 0.8s ease-in-out infinite; animation-delay: 0.0s; }
 
 @keyframes pulse {
-    0%, 100% { height: 8px; opacity: 0.5; }
-    50% { height: 32px; opacity: 1; }
+    0%, 100% { height: 6px; opacity: 0.4; }
+    50% { height: 28px; opacity: 1; }
 }
 
-/* Transcribing state - blue/purple flowing wave */
+/* Transcribing — Apple blue */
 .transcribing .bar {
-    background: linear-gradient(180deg, #667eea, #764ba2);
-    height: 16px;
+    background: #0a84ff;
+    box-shadow: 0 0 10px rgba(10, 132, 255, 0.35);
+    height: 12px;
 }
 
-.transcribing .bar:nth-child(1) { animation: wave 1.2s ease-in-out infinite; animation-delay: 0.0s; }
-.transcribing .bar:nth-child(2) { animation: wave 1.2s ease-in-out infinite; animation-delay: 0.1s; }
-.transcribing .bar:nth-child(3) { animation: wave 1.2s ease-in-out infinite; animation-delay: 0.2s; }
-.transcribing .bar:nth-child(4) { animation: wave 1.2s ease-in-out infinite; animation-delay: 0.3s; }
-.transcribing .bar:nth-child(5) { animation: wave 1.2s ease-in-out infinite; animation-delay: 0.4s; }
-.transcribing .bar:nth-child(6) { animation: wave 1.2s ease-in-out infinite; animation-delay: 0.5s; }
-.transcribing .bar:nth-child(7) { animation: wave 1.2s ease-in-out infinite; animation-delay: 0.6s; }
-.transcribing .bar:nth-child(8) { animation: wave 1.2s ease-in-out infinite; animation-delay: 0.7s; }
-.transcribing .bar:nth-child(9) { animation: wave 1.2s ease-in-out infinite; animation-delay: 0.8s; }
+.transcribing .bar:nth-child(1)  { animation: wave 1.4s ease-in-out infinite; animation-delay: 0.0s; }
+.transcribing .bar:nth-child(2)  { animation: wave 1.4s ease-in-out infinite; animation-delay: 0.08s; }
+.transcribing .bar:nth-child(3)  { animation: wave 1.4s ease-in-out infinite; animation-delay: 0.16s; }
+.transcribing .bar:nth-child(4)  { animation: wave 1.4s ease-in-out infinite; animation-delay: 0.24s; }
+.transcribing .bar:nth-child(5)  { animation: wave 1.4s ease-in-out infinite; animation-delay: 0.32s; }
+.transcribing .bar:nth-child(6)  { animation: wave 1.4s ease-in-out infinite; animation-delay: 0.4s; }
+.transcribing .bar:nth-child(7)  { animation: wave 1.4s ease-in-out infinite; animation-delay: 0.48s; }
+.transcribing .bar:nth-child(8)  { animation: wave 1.4s ease-in-out infinite; animation-delay: 0.56s; }
+.transcribing .bar:nth-child(9)  { animation: wave 1.4s ease-in-out infinite; animation-delay: 0.64s; }
+.transcribing .bar:nth-child(10) { animation: wave 1.4s ease-in-out infinite; animation-delay: 0.72s; }
+.transcribing .bar:nth-child(11) { animation: wave 1.4s ease-in-out infinite; animation-delay: 0.8s; }
 
 @keyframes wave {
     0%, 100% {
-        height: 8px;
-        opacity: 0.4;
+        height: 6px;
+        opacity: 0.35;
         transform: translateY(0);
     }
     50% {
-        height: 28px;
+        height: 24px;
         opacity: 1;
-        transform: translateY(-4px);
+        transform: translateY(-3px);
     }
 }
 
-/* Success state - green check */
-.success .bars-container {
-    display: none;
-}
-
-.success .check {
-    display: flex;
-}
+/* Success — Apple green */
+.success .bars-container { display: none; }
+.success .check { display: flex; }
 
 .check {
     display: none;
-    width: 40px;
-    height: 40px;
+    width: 36px;
+    height: 36px;
     align-items: center;
     justify-content: center;
 }
 
 .check svg {
-    width: 32px;
-    height: 32px;
-    stroke: #4ade80;
-    stroke-width: 3;
+    width: 28px;
+    height: 28px;
+    stroke: #30d158;
+    stroke-width: 2.5;
     fill: none;
     stroke-linecap: round;
     stroke-linejoin: round;
+    filter: drop-shadow(0 0 8px rgba(48, 209, 88, 0.35));
 }
 
 .check svg path {
     stroke-dasharray: 50;
     stroke-dashoffset: 50;
-    animation: drawCheck 0.4s ease-out forwards;
+    animation: drawCheck 0.35s ease-out forwards;
 }
 
 @keyframes drawCheck {
     to { stroke-dashoffset: 0; }
 }
 
+/* Window controls — macOS traffic light style */
+.window-controls {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    display: flex;
+    gap: 5px;
+    z-index: 10;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+}
+
+.container:hover .window-controls {
+    opacity: 1;
+}
+
+.ctrl-btn {
+    width: 12px;
+    height: 12px;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    -webkit-app-region: no-drag;
+    padding: 0;
+    transition: filter 0.15s ease;
+}
+
+.ctrl-btn svg {
+    width: 6px;
+    height: 6px;
+    stroke: rgba(0, 0, 0, 0.5);
+    stroke-width: 2;
+    fill: none;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    opacity: 0;
+    transition: opacity 0.15s ease;
+}
+
+.ctrl-btn:hover svg {
+    opacity: 1;
+}
+
+.ctrl-btn:hover {
+    filter: brightness(1.15);
+}
+
+.close-btn {
+    background: #ff5f57;
+}
+
+.restart-btn-dot {
+    background: #febc2e;
+}
+
+/* Label — Apple SF style */
 .label {
-    color: rgba(255, 255, 255, 0.9);
-    font-size: 13px;
+    color: rgba(255, 255, 255, 0.55);
+    font-size: 10.5px;
     font-weight: 500;
-    letter-spacing: 0.3px;
+    letter-spacing: 0.8px;
     text-transform: uppercase;
 }
 
-.recording .label { color: #ff8e53; }
-.transcribing .label { color: #a78bfa; }
-.success .label { color: #4ade80; }
+.recording .label { color: rgba(255, 159, 10, 0.85); }
+.transcribing .label { color: rgba(10, 132, 255, 0.85); }
+.success .label { color: rgba(48, 209, 88, 0.85); }
 
-/* Error state */
+/* Error — Apple red */
 .error .bar {
-    background: #ef4444;
+    background: #ff453a;
+    box-shadow: 0 0 10px rgba(255, 69, 58, 0.35);
 }
 
-.error .label { color: #ef4444; }
+.error .label { color: rgba(255, 69, 58, 0.85); }
 
 @keyframes shake {
     0%, 100% { transform: translateX(0); }
-    25% { transform: translateX(-4px); }
-    75% { transform: translateX(4px); }
+    25% { transform: translateX(-3px); }
+    75% { transform: translateX(3px); }
 }
 
 .error .bars-container {
-    animation: shake 0.5s ease-in-out;
+    animation: shake 0.4s ease-in-out;
 }
 </style>
 </head>
 <body>
 <div class="container idle" id="container">
+    <div class="window-controls">
+        <button class="ctrl-btn restart-btn-dot" id="restartBtn" title="Restart">
+            <svg viewBox="0 0 24 24">
+                <path d="M4 12h16"/>
+            </svg>
+        </button>
+        <button class="ctrl-btn close-btn" id="closeBtn" title="Close">
+            <svg viewBox="0 0 24 24">
+                <path d="M18 6L6 18"/>
+                <path d="M6 6l12 12"/>
+            </svg>
+        </button>
+    </div>
     <div class="bars-container">
+        <div class="bar"></div>
+        <div class="bar"></div>
         <div class="bar"></div>
         <div class="bar"></div>
         <div class="bar"></div>
@@ -205,7 +291,6 @@ function setState(state, text) {
     const container = document.getElementById('container');
     const label = document.getElementById('label');
 
-    // Reset classes
     container.className = 'container';
 
     if (state === 'idle') {
@@ -216,19 +301,24 @@ function setState(state, text) {
         container.classList.add(state);
         label.textContent = text || state;
 
-        // Reset check animation for success state
         if (state === 'success') {
             const path = document.querySelector('.check svg path');
             if (path) {
                 path.style.animation = 'none';
-                path.offsetHeight; // Trigger reflow
-                path.style.animation = 'drawCheck 0.4s ease-out forwards';
+                path.offsetHeight;
+                path.style.animation = 'drawCheck 0.35s ease-out forwards';
             }
         }
     }
 }
 
-// Start hidden
+document.getElementById('restartBtn').addEventListener('click', function() {
+    pywebview.api.restart_app();
+});
+document.getElementById('closeBtn').addEventListener('click', function() {
+    pywebview.api.close_app();
+});
+
 setState('idle', '');
 </script>
 </body>

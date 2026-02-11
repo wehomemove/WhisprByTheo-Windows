@@ -7,6 +7,7 @@ Push-to-talk voice transcription using OpenAI Whisper API
 import os
 import sys
 import json
+import subprocess
 import tempfile
 import threading
 import time
@@ -173,11 +174,19 @@ class WhisprApp:
             if response.status_code == 200:
                 text = response.json().get("text", "").strip()
                 if text:
-                    # Copy to clipboard and paste
+                    # Copy to clipboard
                     pyperclip.copy(text)
-                    self._show_success()
-                    time.sleep(0.3)
+                    # Minimize our window so the target app has focus
+                    if self.window:
+                        self.window.minimize()
+                    time.sleep(0.2)
+                    # Paste into the active app
                     keyboard.send("ctrl+v")
+                    time.sleep(0.1)
+                    # Restore and show success
+                    if self.window:
+                        self.window.restore()
+                    self._show_success()
                 else:
                     self._show_error("No speech")
             else:
@@ -203,11 +212,91 @@ class WhisprApp:
             time.sleep(1.5)
             self.window.evaluate_js("setState('idle', '')")
 
+    def close_app(self):
+        """Close the application"""
+        keyboard.unhook_all()
+        if self.stream:
+            try:
+                self.stream.stop_stream()
+                self.stream.close()
+            except:
+                pass
+        if self.pyaudio:
+            try:
+                self.pyaudio.terminate()
+            except:
+                pass
+        os._exit(0)
+
+    def restart_app(self):
+        """Restart the application"""
+        keyboard.unhook_all()
+        if self.stream:
+            try:
+                self.stream.stop_stream()
+                self.stream.close()
+            except:
+                pass
+        if self.pyaudio:
+            try:
+                self.pyaudio.terminate()
+            except:
+                pass
+        subprocess.Popen([sys.executable] + sys.argv)
+        os._exit(0)
+
     def register_hotkey(self):
         """Register the global hotkey"""
         keyboard.unhook_all()
-        keyboard.on_press_key(self.hotkey, lambda _: self.start_recording())
-        keyboard.on_release_key(self.hotkey, lambda _: self.stop_recording())
+        if '+' in self.hotkey:
+            # Combination hotkey (e.g. ctrl+alt, ctrl+shift+space)
+            keys = [k.strip() for k in self.hotkey.split('+')]
+            keyboard.add_hotkey(self.hotkey, self.start_recording, suppress=False)
+            for key in keys:
+                keyboard.on_release_key(key, lambda _: self.stop_recording())
+        else:
+            # Single key (e.g. f8)
+            keyboard.on_press_key(self.hotkey, lambda _: self.start_recording())
+            keyboard.on_release_key(self.hotkey, lambda _: self.stop_recording())
+
+    def _make_transparent(self):
+        """Apply true transparency via Windows DWM API"""
+        try:
+            import ctypes
+            from ctypes import wintypes
+            time.sleep(0.3)  # Wait for window to initialize
+
+            # Find our window
+            hwnd = ctypes.windll.user32.FindWindowW(None, "WhisprByTheo")
+            if not hwnd:
+                return
+
+            # Set layered window style
+            GWL_EXSTYLE = -20
+            WS_EX_LAYERED = 0x80000
+            style = ctypes.windll.user32.GetWindowLongW(hwnd, GWL_EXSTYLE)
+            ctypes.windll.user32.SetWindowLongW(hwnd, GWL_EXSTYLE, style | WS_EX_LAYERED)
+
+            # DWM: extend frame into client area for transparency
+            class MARGINS(ctypes.Structure):
+                _fields_ = [
+                    ("cxLeftWidth", ctypes.c_int),
+                    ("cxRightWidth", ctypes.c_int),
+                    ("cyTopHeight", ctypes.c_int),
+                    ("cyBottomHeight", ctypes.c_int),
+                ]
+            margins = MARGINS(-1, -1, -1, -1)
+            ctypes.windll.dwmapi.DwmExtendFrameIntoClientArea(hwnd, ctypes.byref(margins))
+
+            # Set window corner preference to round (Windows 11)
+            DWMWA_WINDOW_CORNER_PREFERENCE = 33
+            DWM_ROUND = ctypes.c_int(2)  # DWMWCP_ROUND
+            ctypes.windll.dwmapi.DwmSetWindowAttribute(
+                hwnd, DWMWA_WINDOW_CORNER_PREFERENCE,
+                ctypes.byref(DWM_ROUND), ctypes.sizeof(DWM_ROUND)
+            )
+        except Exception as e:
+            print(f"Transparency setup: {e}")
 
     def run(self):
         """Start the app"""
@@ -219,8 +308,8 @@ class WhisprApp:
         self.window = webview.create_window(
             "WhisprByTheo",
             str(html_path),
-            width=220,
-            height=140,
+            width=240,
+            height=130,
             resizable=False,
             frameless=True,
             on_top=True,
@@ -228,7 +317,7 @@ class WhisprApp:
             js_api=self
         )
 
-        webview.start()
+        webview.start(func=self._make_transparent)
 
 
 # Entry point for packaged app
